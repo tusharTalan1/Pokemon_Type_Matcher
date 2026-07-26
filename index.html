@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PokéQuiz – Pokémon Type Matcher</title>
+    <meta name="description" content="Test your Pokémon knowledge! Guess the correct type for each Pokémon in this fun quiz game." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Header / Stats Bar -->
+    <header class="stats-bar" id="stats-bar">
+
+      <!-- Top row: brand (left) + score (right) -->
+      <div class="stats-top-row">
+        <div class="brand">
+          <div class="pokeball-icon" aria-label="Pokéball">
+            <div class="pokeball-top"></div>
+            <div class="pokeball-middle">
+              <div class="pokeball-btn"></div>
+            </div>
+            <div class="pokeball-bottom"></div>
+          </div>
+          <span class="brand-name">PokéQuiz</span>
+        </div>
+
+        <div class="score-section">
+          <div class="total-score-label">TOTAL SCORE</div>
+          <div class="total-score-value" id="total-score">0</div>
+          <div class="streak-badge" id="streak-badge">
+            <span class="streak-icon">⚡</span> Streak: <span id="streak-count">0</span>
+          </div>
+        </div>
+      </div><!-- /.stats-top-row -->
+
+      <!-- Bottom row: level badge + XP bar -->
+      <div class="stats-bottom-row">
+        <div class="level-badge" id="level-badge">LVL <span id="level-num">1</span></div>
+        <div class="xp-bar-wrapper">
+          <span class="xp-text" id="xp-text">0 / 1000 XP</span>
+          <div class="xp-bar-bg">
+            <div class="xp-bar-fill" id="xp-bar-fill" style="width: 0%"></div>
+          </div>
+        </div>
+      </div><!-- /.stats-bottom-row -->
+
+    </header>
+
+    <!-- Main Game Area -->
+    <main class="game-area">
+      <!-- Pokédex Display Container (No Card Styling) -->
+      <div class="pokedex-container" id="pokedex-container">
+        <img
+          src="Assests/pokidex.gif"
+          alt="Pokédex showing current Pokémon"
+          class="pokedex-gif"
+          id="pokedex-gif"
+        />
+
+        <!-- Feedback overlay -->
+        <div class="feedback-overlay" id="feedback-overlay">
+          <div class="feedback-content" id="feedback-content"></div>
+        </div>
+      </div>
+
+      <!-- Question -->
+      <div class="question-text" id="question-text">
+        What type is this Pokémon?
+      </div>
+
+      <!-- Answer Buttons -->
+      <section class="answer-grid" id="answer-grid" aria-label="Type answer choices">
+        <button class="answer-btn type-electric" id="btn-0" data-type="Electric">
+          <span class="type-icon">⚡</span>
+          <span class="type-label">Electric</span>
+        </button>
+        <button class="answer-btn type-fire" id="btn-1" data-type="Fire">
+          <span class="type-icon">🔥</span>
+          <span class="type-label">Fire</span>
+        </button>
+        <button class="answer-btn type-water" id="btn-2" data-type="Water">
+          <span class="type-icon">💧</span>
+          <span class="type-label">Water</span>
+        </button>
+        <button class="answer-btn type-grass" id="btn-3" data-type="Grass">
+          <span class="type-icon">🌿</span>
+          <span class="type-label">Grass</span>
+        </button>
+      </section>
+    </main>
+
+    <!-- Result Modal -->
+    <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-box" id="modal-box">
+        <div class="modal-emoji" id="modal-emoji">🎉</div>
+        <h2 class="modal-title" id="modal-title">Correct!</h2>
+        <p class="modal-body" id="modal-body">Great job identifying the type!</p>
+        <button class="modal-btn" id="modal-next-btn">Next Pokémon →</button>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
