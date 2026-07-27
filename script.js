@@ -122,7 +122,40 @@ function buildChoices(correctType) {
   return shuffle([correctType, ...wrong.slice(0, 3)]);
 }
 
+function updateStats() {
+  dom.levelNums.forEach((el) => (el.textContent = state.level));
+  dom.xpTexts.forEach((el) => (el.textContent = `${state.currentXP} / ${state.xpPerLevel} XP`));
+  dom.xpBarFills.forEach((el) => (el.style.width = `${(state.currentXP / state.xpPerLevel) * 100}%`));
+  dom.totalScores.forEach((el) => (el.textContent = state.totalScore));
+  dom.streakCounts.forEach((el) => (el.textContent = state.streak));
 
+  const hearts = "❤️".repeat(Math.max(0, state.lives)) + "🖤".repeat(Math.max(0, 3 - state.lives));
+  dom.livesDisplays.forEach((el) => (el.textContent = hearts));
+}
+
+function awardXP(amount) {
+  state.currentXP += amount;
+  while (state.currentXP >= state.xpPerLevel) {
+    state.currentXP -= state.xpPerLevel;
+    state.level++;
+    state.xpPerLevel = getXPPerLevel(state.level);
+    showLevelUpBanner();
+  }
+  saveState();
+  updateStats();
+}
+
+function showLevelUpBanner() {
+  const toast = document.createElement("div");
+  toast.className = "level-up-toast";
+  toast.textContent = `🎊 Level ${state.level}!`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.classList.add("show"), 50);
+  setTimeout(() => {
+    toast.classList.remove("show");
+    setTimeout(() => toast.remove(), 400);
+  }, 2200);
+}
 
 async function fetchTypePool(type) {
   const res = await fetch(`${POKEAPI_BASE}/type/${type.toLowerCase()}`);
@@ -304,7 +337,51 @@ function handleAnswer(btn) {
   }
 }
 
+function showResultCard(isCorrect, correctType) {
+  dom.resultLevel.textContent = isCorrect
+    ? `Level ${state.level} Completed`
+    : `Level ${state.level}`;
 
+  dom.resultHeading.textContent = isCorrect ? "Correct!" : "Not Quite!";
+  dom.resultSub.innerHTML = isCorrect
+    ? "You're a PokéMaster!"
+    : `The correct type was ${TYPE_ICONS[correctType]} ${correctType}.`;
+
+  dom.resultTip.textContent = `Quick Tip: ${TYPE_TIPS[correctType]}`;
+  dom.resultNextBtn.textContent = "Next Pokémon →";
+
+  if (isCorrect) {
+    dom.resultCard.classList.remove("failure");
+    dom.resultCard.classList.add("success");
+    dom.resultIconContainer.innerHTML = `
+      <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+    `;
+  } else {
+    dom.resultCard.classList.remove("success");
+    dom.resultCard.classList.add("failure");
+    dom.resultIconContainer.innerHTML = `
+      <svg viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+    `;
+  }
+
+  dom.resultOverlay.classList.add("show");
+}
+
+function showGameOver(correctType) {
+  dom.resultLevel.textContent = "Game Over";
+  dom.resultHeading.textContent = "Game Over!";
+  dom.resultSub.textContent = `You ran out of lives! Final Score: ${state.totalScore}`;
+  dom.resultTip.textContent = `Quick Tip: ${TYPE_TIPS[correctType]}`;
+  dom.resultNextBtn.innerHTML = `Restart Game <i class="fa-solid fa-arrow-rotate-left"></i>`;
+
+  dom.resultCard.classList.remove("success");
+  dom.resultCard.classList.add("failure");
+  dom.resultIconContainer.innerHTML = `
+    <i class="fa-solid fa-skull" style="font-size: 2.2rem; line-height: 1; color: #fff;"></i>
+  `;
+
+  dom.resultOverlay.classList.add("show");
+}
 
 dom.buttons.forEach((btn) => {
   btn.addEventListener("click", () => handleAnswer(btn));
@@ -316,7 +393,41 @@ dom.buttons.forEach((btn) => {
   });
 });
 
+dom.resultNextBtn.addEventListener("click", () => {
+  dom.resultOverlay.classList.remove("show");
+  if (state.lives <= 0) {
+    state.totalScore = 0;
+    state.streak = 0;
+    state.level = 1;
+    state.currentXP = 0;
+    state.lives = 3;
+    state.xpPerLevel = getXPPerLevel(1);
+  }
+  state.currentPokemon = null;
+  state.choices = null;
+  state.answered = false;
+  saveState();
+  updateStats();
+  renderRound();
+});
+dom.resultOverlay.addEventListener("click", (e) => {
+  if (e.target === dom.resultOverlay && state.lives > 0) {
+    dom.resultOverlay.classList.remove("show");
+    state.currentPokemon = null;
+    state.choices = null;
+    state.answered = false;
+    saveState();
+    renderRound();
+  }
+});
+dom.retryBtn.addEventListener("click", () => {
+  state.currentPokemon = null;
+  state.choices = null;
+  state.answered = false;
+  saveState();
+  renderRound();
+});
 
-
-
+loadState();
+updateStats();
 renderRound();
