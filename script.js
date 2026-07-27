@@ -23,7 +23,58 @@ function getXPPerLevel(level) {
   return 1000;
 }
 
+const state = {
+  totalScore: 0,
+  streak: 0,
+  level: 1,
+  currentXP: 0,
+  lives: 3,
+  xpPerLevel: 300,
+  xpPerCorrect: 100,
+  scorePerCorrect: 50,
+  currentPokemon: null,
+  choices: null,
+  answered: false,
+  typePools: {},
+};
 
+function saveState() {
+  localStorage.setItem("pokeQuizState", JSON.stringify({
+    totalScore: state.totalScore,
+    streak: state.streak,
+    level: state.level,
+    currentXP: state.currentXP,
+    lives: state.lives,
+    currentPokemon: state.currentPokemon,
+    choices: state.choices,
+    answered: state.answered,
+  }));
+}
+
+function loadState() {
+  const saved = localStorage.getItem("pokeQuizState");
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      state.totalScore = parsed.totalScore ?? 0;
+      state.streak = parsed.streak ?? 0;
+      state.level = parsed.level ?? 1;
+      state.currentXP = parsed.currentXP ?? 0;
+      state.lives = parsed.lives ?? 3;
+      state.xpPerLevel = getXPPerLevel(state.level);
+      if (parsed.currentPokemon && parsed.choices && !parsed.answered) {
+        state.currentPokemon = parsed.currentPokemon;
+        state.choices = parsed.choices;
+        state.answered = false;
+      } else {
+        state.currentPokemon = null;
+        state.choices = null;
+        state.answered = false;
+      }
+    } catch (e) {
+    }
+  }
+}
 
 const dom = {
   levelNums: document.querySelectorAll(".level-num-val"),
